@@ -13,3 +13,4 @@ class Network:
 	def send(self, coordinates):
 		self.coordinates.putNumber('angle', coordinates.angle)
 		self.coordinates.putNumber('distance', coordinates.distance)
+		print("Sending ("+str(coordinates.angle)+","+str(coordinates.distance)+")")

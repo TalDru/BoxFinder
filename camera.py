@@ -8,6 +8,8 @@ class Camera:
 
 	def __init__(self):
 		self.capture = cv2.VideoCapture(0)
+		self.capture.set(3, 320)
+		self.capture.set(4, 240)
 		print("Connected to camera")
 
 	def tomat(self):
