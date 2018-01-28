@@ -11,8 +11,8 @@ IS_FOUND = 0
 MORPH = 7
 CANNY = 250
 ##################
-_width  = 480.0
-_height = 320.0
+_width  = 320.0
+_height = 240.0
 _margin = 0.0
 ##################
 
@@ -33,7 +33,7 @@ lower_yellow = np.array([20,100,60])
 upper_yellow = np.array([50,230,200])
 #lower_yellow = np.array([30,40,0])
 #upper_yellow = np.array([100,100,100])
-camera_width = 480
+camera_width = 320
 camera_fov   = 60
 cube_width   = 42 #centimeters
 cube_height  = 69 #changethese
@@ -89,33 +89,35 @@ def filterbyshape(matrice):
 	kernel = cv2.getStructuringElement( cv2.MORPH_RECT, ( MORPH, MORPH ) )
 	closed = cv2.morphologyEx( edges, cv2.MORPH_CLOSE, kernel )
 	h, contours, _ = cv2.findContours( closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE )
+	maxS = -1
 
 	for cont in contours:
-		if cv2.contourArea ( cont ) > 5000 :
+		if cv2.contourArea ( cont ) > 4250 :
 			arc_len = cv2.arcLength( cont, True )
 			approx = cv2.approxPolyDP( cont, 0.1 * arc_len, True )
 			if ( len( approx ) >= 4 and len( approx ) <= 6 ):
 				IS_FOUND = 1
 				area = cv2.contourArea ( cont )
-				M = cv2.moments( cont )
-				cX = int(M["m10"] / M["m00"])
-				cY = int(M["m01"] / M["m00"])
-				#cv2.putText(rgb, "Center", (cX, cY), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
-				pts_src = np.array( approx, np.float32 )
-				
-				c = cont
-				extLeft = tuple(c[c[:, :, 0].argmin()][0])
-				extRight = tuple(c[c[:, :, 0].argmax()][0])
-				#extTop = tuple(c[c[:, :, 1].argmin()][0])
-				#extBot = tuple(c[c[:, :, 1].argmax()][0])
+				if (area > maxS):
+                                        M = cv2.moments( cont )
+                                        cX = int(M["m10"] / M["m00"])
+                                        cY = int(M["m01"] / M["m00"])
+                                        #cv2.putText(rgb, "Center", (cX, cY), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+                                        pts_src = np.array( approx, np.float32 )
+                                        
+                                        c = cont
+                                        extLeft = tuple(c[c[:, :, 0].argmin()][0])
+                                        extRight = tuple(c[c[:, :, 0].argmax()][0])
+                                        #extTop = tuple(c[c[:, :, 1].argmin()][0])
+                                        #extBot = tuple(c[c[:, :, 1].argmax()][0])
 
-				#h, status = cv2.findHomography( pts_src, pts_dst )
-				out = cv2.warpPerspective( rgb, h, ( int( _width + _margin * 2 ), int( _height + _margin * 2 ) ) )
-				cv2.drawContours( rgb, [approx], -1, ( 255, 0, 0 ), 2 )
+                                        #h1, status = cv2.findHomography( pts_src, pts_dst )
+                                        #out = cv2.warpPerspective( rgb, h1, ( int( _width + _margin * 2 ), int( _height + _margin * 2 ) ) )
+                                        #cv2.drawContours( rgb, [approx], -1, ( 255, 0, 0 ), 2 )
 			else : pass
 
-	if IS_FOUND :
-		cv2.imshow('Found', out )
+	#if IS_FOUND :
+	#	cv2.imshow('Found', out )
 
 	return extLeft, extRight, cX, cY, area
 
